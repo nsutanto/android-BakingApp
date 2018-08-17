@@ -3,8 +3,10 @@ package nsutanto.bakingapp.fragment;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
+import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,17 +25,21 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nsutanto.bakingapp.R;
 import nsutanto.bakingapp.adapter.RecipeAdapter;
+import nsutanto.bakingapp.listener.IRecipeFragmentListener;
+import nsutanto.bakingapp.listener.IRecipeListener;
 import nsutanto.bakingapp.model.Recipe;
 import nsutanto.bakingapp.utils.NetworkUtil;
 
 // TODO: Implement Async Task Loader
-public class RecipeFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<String> {
+public class RecipeFragment extends Fragment implements LoaderManager.LoaderCallbacks<String>, IRecipeListener {
 
     @BindView(R.id.rv_recipe) RecyclerView rv_recipe;
     RecipeAdapter recipeAdapter;
+    private IRecipeFragmentListener iRecipeFragmentListener;
     private List<Recipe> recipes;
     private static final String RECIPE_URL_EXTRA = "recipe";
+    private static final String RECIPE_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
+    private static final int RECIPE_LOADER_ID = 1;
 
     public RecipeFragment() {
     }
@@ -43,17 +49,59 @@ public class RecipeFragment extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_recipe, container, false);
         ButterKnife.bind(this, view);
 
-
-
-        loadRecipes();
+        setupRecyclerView(view);
+        setupLoader(savedInstanceState);
         return view;
     }
 
-    private void loadRecipes() {
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
+        try {
+            iRecipeFragmentListener = (IRecipeFragmentListener) context;
+        } catch (ClassCastException ec) {
+            throw new ClassCastException(context.toString()
+                    + " must implement listener");
+        }
     }
 
+    private void setupRecyclerView(View view) {
+        recipeAdapter = new RecipeAdapter(this);
+        rv_recipe.setNestedScrollingEnabled(false);
 
+        //if (view.findViewById(R.id.check_view) != null)
+        //    recipeList.setLayoutManager(new GridLayoutManager(rootView.getContext(), 2, GridLayoutManager.VERTICAL, false));
+        //else
+        rv_recipe.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+
+        rv_recipe.setHasFixedSize(true);
+        rv_recipe.setAdapter(recipeAdapter);
+    }
+
+    private void setupLoader(Bundle savedInstanceState) {
+        LoaderManager loaderManager = getActivity().getLoaderManager();
+        if (savedInstanceState == null) {
+            Bundle recipeBundle = new Bundle();
+            recipeBundle.putString(RECIPE_URL_EXTRA, RECIPE_URL);
+            Loader<String> recipeLoader = loaderManager.getLoader(RECIPE_LOADER_ID);
+
+            if (recipeLoader == null)
+                loaderManager.initLoader(RECIPE_LOADER_ID, recipeBundle, this);
+            else
+                loaderManager.restartLoader(RECIPE_LOADER_ID, recipeBundle, this);
+
+        } else {
+            loaderManager.initLoader(RECIPE_LOADER_ID, null, this);
+        }
+    }
+
+    @Override
+    public void OnRecipeClick(Recipe recipe) {
+        iRecipeFragmentListener.OnRecipeClick(recipe);
+    }
+
+    // ----- LOADER ----- //
     @Override
     public Loader<String> onCreateLoader(int id, final Bundle args) {
         return new AsyncTaskLoader<String>(getContext()) {
@@ -103,7 +151,7 @@ public class RecipeFragment extends Fragment implements
         if (data != null) {
             Type recipeListType = new TypeToken<ArrayList<Recipe>>(){}.getType();
             recipes = new Gson().fromJson(data, recipeListType);
-            //recipeListAdapter.setRecipeModelList(recipeModel);
+            recipeAdapter.setRecipes(recipes);
         }
     }
 
