@@ -4,11 +4,11 @@ import java.io.Serializable;
 
 public class Ingredient implements Serializable {
 
-    private int quantity;
+    private float quantity;
     private String measure;
     private String ingredient;
 
-    public int getQuantity() {
+    public float getQuantity() {
         return quantity;
     }
 
