@@ -70,6 +70,7 @@ public class RecipeFragment extends Fragment implements LoaderManager.LoaderCall
         recipeAdapter = new RecipeAdapter(this);
         rv_recipe.setNestedScrollingEnabled(false);
 
+        // TODO : Set for Horizontal
         //if (view.findViewById(R.id.check_view) != null)
         //    recipeList.setLayoutManager(new GridLayoutManager(rootView.getContext(), 2, GridLayoutManager.VERTICAL, false));
         //else
