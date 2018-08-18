@@ -6,31 +6,45 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import nsutanto.bakingapp.R;
+import nsutanto.bakingapp.listener.IStepListener;
 import nsutanto.bakingapp.model.Step;
 
 public class StepAdapter extends RecyclerView.Adapter<StepAdapter.ViewHolder> {
 
     private List<Step> steps = new ArrayList<>();
     private Context context;
+    private IStepListener stepListener;
 
+    public StepAdapter(IStepListener stepListener) {
+        this.stepListener = stepListener;
+    }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        //private final TextView tv_content;
-        //private final TextView tv_author;
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        @BindView(R.id.tv_step)
+        TextView tv_step;
 
         public ViewHolder(View v) {
             super(v);
-            //tv_author = v.findViewById(R.id.tv_author);
-            //tv_content = v.findViewById(R.id.tv_content);
+            ButterKnife.bind(this, v);
+            v.setOnClickListener(this);
         }
 
         public void bind(Step step) {
-            //tv_author.setText(review.getAuthor());
-            //tv_content.setText(review.getContent());
+            tv_step.setText((step.getShortDescription()));
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            stepListener.OnStepClick(steps.get(position));
         }
     }
 
@@ -39,9 +53,8 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.ViewHolder> {
     public StepAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        //View view = inflater.inflate(R.layout.review_item, parent, false);
-        //return new ViewHolder(view);
-        return null;
+        View view = inflater.inflate(R.layout.step_item, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -55,7 +68,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.ViewHolder> {
         return steps.size();
     }
 
-    public void setReviews(List<Step> steps) {
+    public void setSteps(List<Step> steps) {
         this.steps = steps;
         notifyDataSetChanged();
     }
