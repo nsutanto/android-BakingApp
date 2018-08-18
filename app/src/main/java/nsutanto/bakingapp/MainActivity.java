@@ -1,6 +1,7 @@
 package nsutanto.bakingapp;
 
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -30,6 +31,10 @@ public class MainActivity extends AppCompatActivity implements IRecipeFragmentLi
 
     @Override
     public void OnRecipeClick(Recipe recipe) {
-
+        Intent intent = new Intent(this, StepActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("recipe", recipe);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 }
