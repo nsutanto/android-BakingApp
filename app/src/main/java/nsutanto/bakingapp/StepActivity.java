@@ -4,18 +4,21 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 import java.util.List;
 
 import nsutanto.bakingapp.fragment.RecipeFragment;
 import nsutanto.bakingapp.fragment.StepFragment;
 import nsutanto.bakingapp.listener.IStepFragmentListener;
+import nsutanto.bakingapp.model.Ingredient;
 import nsutanto.bakingapp.model.Recipe;
 import nsutanto.bakingapp.model.Step;
 
 public class StepActivity extends AppCompatActivity implements IStepFragmentListener {
 
-    private List<Step> steps;
+    Recipe recipe;
+    List<Step> steps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +32,7 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
     private void getBundle() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        Recipe recipe = (Recipe) bundle.getSerializable("recipe");
+        recipe = (Recipe) bundle.getSerializable("recipe");
         steps = recipe.getSteps();
     }
 
@@ -42,6 +45,14 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
         fm.beginTransaction()
                 .add(R.id.step_container, stepFragment)
                 .commit();
+    }
+
+    public void onIngredientClicked(View v) {
+        Intent intent = new Intent(this, IngredientActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("recipe", recipe);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     @Override
