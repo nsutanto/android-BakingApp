@@ -17,6 +17,7 @@ import nsutanto.bakingapp.model.Step;
 public class IngredientActivity extends AppCompatActivity {
 
     private List<Ingredient> ingredients;
+    private Recipe recipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +26,13 @@ public class IngredientActivity extends AppCompatActivity {
 
         getBundle();
         setupFragment();
+        setupUI();
     }
 
     private void getBundle() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        Recipe recipe = (Recipe) bundle.getSerializable("recipe");
+        recipe = (Recipe) bundle.getSerializable("recipe");
         ingredients = recipe.getIngredients();
     }
 
@@ -43,5 +45,9 @@ public class IngredientActivity extends AppCompatActivity {
         fm.beginTransaction()
                 .add(R.id.ingredient_container, ingredientFragment)
                 .commit();
+    }
+
+    private void setupUI() {
+        setTitle(recipe.getName() + " ingredients");
     }
 }

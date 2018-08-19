@@ -42,9 +42,9 @@ public class StepDetailFragment extends Fragment {
     }
 
     private void setupUI() {
-        tv_description.setText(description);
-        tv_short_description.setText(shortDescription);
+        if (!description.equals(shortDescription)) {
+            tv_description.setText(description);
+            tv_short_description.setText(shortDescription);
+        }
     }
-
-
 }

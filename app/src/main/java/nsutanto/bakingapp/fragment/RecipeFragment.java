@@ -6,6 +6,7 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -70,11 +71,12 @@ public class RecipeFragment extends Fragment implements LoaderManager.LoaderCall
         recipeAdapter = new RecipeAdapter(this);
         rv_recipe.setNestedScrollingEnabled(false);
 
-        // TODO : Set for Horizontal
-        //if (view.findViewById(R.id.check_view) != null)
-        //    recipeList.setLayoutManager(new GridLayoutManager(rootView.getContext(), 2, GridLayoutManager.VERTICAL, false));
-        //else
-        rv_recipe.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        if (view.findViewById(R.id.fl_recipe_tablet) != null) {
+            rv_recipe.setLayoutManager(new GridLayoutManager(view.getContext(), 2, GridLayoutManager.VERTICAL, false));
+        }
+        else {
+            rv_recipe.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
+        }
 
         rv_recipe.setHasFixedSize(true);
         rv_recipe.setAdapter(recipeAdapter);

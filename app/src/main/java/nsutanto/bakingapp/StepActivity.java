@@ -27,6 +27,7 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
 
         getBundle();
         setupFragment();
+        setupUI();
     }
 
     private void getBundle() {
@@ -47,6 +48,10 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
                 .commit();
     }
 
+    private void setupUI() {
+        setTitle(recipe.getName());
+    }
+
     public void onIngredientClicked(View v) {
         Intent intent = new Intent(this, IngredientActivity.class);
         Bundle bundle = new Bundle();
@@ -57,6 +62,10 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
 
     @Override
     public void OnStepClick(Step step) {
-
+        Intent intent = new Intent(this, StepDetailActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("step", step);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 }
