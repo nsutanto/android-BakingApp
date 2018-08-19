@@ -42,13 +42,7 @@ public class IngredientFragment extends Fragment {
     private void setupRecyclerView(View view) {
         ingredientAdapter = new IngredientAdapter();
         rv_ingredient.setNestedScrollingEnabled(false);
-
-        // TODO : Set for Horizontal
-        //if (view.findViewById(R.id.check_view) != null)
-        //    recipeList.setLayoutManager(new GridLayoutManager(rootView.getContext(), 2, GridLayoutManager.VERTICAL, false));
-        //else
         rv_ingredient.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
-
         rv_ingredient.setHasFixedSize(true);
         rv_ingredient.setAdapter(ingredientAdapter);
         ingredientAdapter.setIngredients(ingredients);
