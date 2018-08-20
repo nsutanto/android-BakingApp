@@ -62,11 +62,6 @@ public class StepFragment extends Fragment implements IStepListener {
     private void setupRecyclerView(View view) {
         stepAdapter = new StepAdapter(this);
         rv_step.setNestedScrollingEnabled(false);
-
-        // TODO : Set for Horizontal
-        //if (view.findViewById(R.id.check_view) != null)
-        //    recipeList.setLayoutManager(new GridLayoutManager(rootView.getContext(), 2, GridLayoutManager.VERTICAL, false));
-        //else
         rv_step.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.VERTICAL, false));
 
         rv_step.setHasFixedSize(true);
