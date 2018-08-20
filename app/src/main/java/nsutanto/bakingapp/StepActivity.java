@@ -1,21 +1,19 @@
 package nsutanto.bakingapp;
 
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import java.util.List;
 
 import nsutanto.bakingapp.fragment.IngredientFragment;
 import nsutanto.bakingapp.fragment.MediaFragment;
-import nsutanto.bakingapp.fragment.RecipeFragment;
 import nsutanto.bakingapp.fragment.StepDetailFragment;
 import nsutanto.bakingapp.fragment.StepFragment;
 import nsutanto.bakingapp.listener.IStepFragmentListener;
-import nsutanto.bakingapp.model.Ingredient;
 import nsutanto.bakingapp.model.Recipe;
 import nsutanto.bakingapp.model.Step;
 
@@ -23,8 +21,15 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
 
     private Recipe recipe;
     private List<Step> steps;
-    private Step lastStepDetail;
-    private Step lastStepMedia;
+
+    private Boolean isMediaAdded = false;
+    private Boolean isStepDetailAdded = false;
+    private FragmentManager fm = getFragmentManager();
+    private StepFragment stepFragment = new StepFragment();
+    private IngredientFragment ingredientFragment = new IngredientFragment();
+    private MediaFragment mediaFragment = new MediaFragment();
+    private StepDetailFragment stepDetailFragment = new StepDetailFragment();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +49,8 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
     }
 
     private void setupFragment() {
-        FragmentManager fm = getFragmentManager();
 
-        StepFragment stepFragment = new StepFragment();
         stepFragment.setSteps(steps);
-
         fm.beginTransaction()
                 .add(R.id.step_container, stepFragment)
                 .commit();
@@ -56,9 +58,7 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
 
         if (findViewById(R.id.tablet_step_layout) != null) {
 
-            IngredientFragment ingredientFragment = new IngredientFragment();
             ingredientFragment.setIngredients(recipe.getIngredients());
-
             fm.beginTransaction()
                     .add(R.id.ingredient_container, ingredientFragment)
                     .commit();
@@ -77,14 +77,15 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
             intent.putExtras(bundle);
             startActivity(intent);
         } else {
-            FrameLayout ingredient_layout = findViewById(R.id.ingredient_container);
-            ingredient_layout.setVisibility(View.VISIBLE);
 
-            FrameLayout media_layout = findViewById(R.id.media_container);
-            media_layout.setVisibility(View.GONE);
+            FragmentTransaction transaction = fm.beginTransaction();
 
-            FrameLayout step_detail_layout = findViewById(R.id.step_detail_container);
-            step_detail_layout.setVisibility(View.GONE);
+            transaction.add(R.id.ingredient_container, ingredientFragment);
+            transaction.remove(mediaFragment);
+            transaction.remove(stepDetailFragment);
+            transaction.commit();
+            isMediaAdded = false;
+            isStepDetailAdded = false;
         }
     }
 
@@ -98,51 +99,34 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
             intent.putExtras(bundle);
             startActivity(intent);
         } else {
-            FrameLayout ingredient_layout = findViewById(R.id.ingredient_container);
-            ingredient_layout.setVisibility(View.GONE);
 
-            FrameLayout media_layout = findViewById(R.id.media_container);
-            media_layout.setVisibility(View.VISIBLE);
+            FragmentTransaction transaction = fm.beginTransaction();
+            transaction.remove(ingredientFragment);
 
-            FrameLayout step_detail_layout = findViewById(R.id.step_detail_container);
-            step_detail_layout.setVisibility(View.VISIBLE);
-            FragmentManager fm = getFragmentManager();
             if (!step.getVideoURL().equals("") || !step.getThumbnailURL().equals("")) {
 
-                MediaFragment mediaFragment = new MediaFragment();
                 mediaFragment.setMediaURL(step.getVideoURL(), step.getThumbnailURL());
 
-                if (lastStepMedia == null) {
-                    lastStepMedia = step;
-                    fm.beginTransaction()
-                        .add(R.id.media_container, mediaFragment)
-                        .commit();
+                if (!isMediaAdded) {
+                    transaction.add(R.id.media_container, mediaFragment);
+                    isMediaAdded = true;
                 } else {
-                    lastStepMedia = step;
-                    fm.beginTransaction()
-                            .replace(R.id.media_container, mediaFragment)
-                            .commit();
+                    mediaFragment.resetMedia();
                 }
-            }
-            else {
-                //lastStepMedia = null;
-            }
-
-            StepDetailFragment stepDetailFragment = new StepDetailFragment();
-            stepDetailFragment.setStepDetail(step.getShortDescription(), step.getDescription());
-
-            if (lastStepDetail == null) {
-                lastStepDetail = step;
-                fm.beginTransaction()
-                        .add(R.id.step_detail_container, stepDetailFragment)
-                        .commit();
             } else {
-                lastStepDetail = step;
-                fm.beginTransaction()
-                        .replace(R.id.step_detail_container, stepDetailFragment)
-                        .commit();
+                transaction.remove(mediaFragment);
+                isMediaAdded = false;
             }
 
+            stepDetailFragment.setStepDetail(step.getShortDescription(), step.getDescription());
+            if (!isStepDetailAdded) {
+                transaction.add(R.id.step_detail_container, stepDetailFragment);
+                isStepDetailAdded = true;
+            } else {
+                stepDetailFragment.resetStepDetail();
+            }
+
+            transaction.commit();
         }
     }
 }
