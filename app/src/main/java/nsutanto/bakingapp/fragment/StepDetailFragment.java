@@ -32,6 +32,11 @@ public class StepDetailFragment extends Fragment {
         this.description = description;
     }
 
+    public void resetStepDetail() {
+        tv_description.setText(description);
+        tv_short_description.setText(shortDescription);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_step_detail, container, false);
