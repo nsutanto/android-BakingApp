@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import java.io.Serializable;
 import java.util.List;
 
 import nsutanto.bakingapp.fragment.IngredientFragment;
@@ -96,6 +97,7 @@ public class StepActivity extends AppCompatActivity implements IStepFragmentList
             Intent intent = new Intent(this, StepDetailActivity.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable("step", step);
+            bundle.putSerializable("steps", (Serializable) steps);
             intent.putExtras(bundle);
             startActivity(intent);
         } else {
