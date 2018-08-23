@@ -6,6 +6,10 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +29,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nsutanto.bakingapp.R;
+import nsutanto.bakingapp.RecipeIdlingResource;
 import nsutanto.bakingapp.adapter.RecipeAdapter;
 import nsutanto.bakingapp.listener.IRecipeFragmentListener;
 import nsutanto.bakingapp.listener.IRecipeListener;
@@ -42,6 +47,19 @@ public class RecipeFragment extends Fragment implements LoaderManager.LoaderCall
     private static final String RECIPE_URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
     private static final int RECIPE_LOADER_ID = 1;
 
+    @Nullable
+    private RecipeIdlingResource recipeIdlingResource;
+
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (recipeIdlingResource == null) {
+            recipeIdlingResource = new RecipeIdlingResource();
+        }
+        return recipeIdlingResource;
+    }
+
+
     public RecipeFragment() {
     }
 
@@ -49,6 +67,9 @@ public class RecipeFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recipe, container, false);
         ButterKnife.bind(this, view);
+
+        if (recipeIdlingResource != null)
+            recipeIdlingResource.setIdleState(false);
 
         setupRecyclerView(view);
         setupLoader(savedInstanceState);
@@ -85,9 +106,14 @@ public class RecipeFragment extends Fragment implements LoaderManager.LoaderCall
     private void setupLoader(Bundle savedInstanceState) {
         LoaderManager loaderManager = getActivity().getLoaderManager();
         if (savedInstanceState == null) {
+
+            if (recipeIdlingResource != null)
+                recipeIdlingResource.setIdleState(true);
+
             Bundle recipeBundle = new Bundle();
             recipeBundle.putString(RECIPE_URL_EXTRA, RECIPE_URL);
             Loader<String> recipeLoader = loaderManager.getLoader(RECIPE_LOADER_ID);
+
 
             if (recipeLoader == null)
                 loaderManager.initLoader(RECIPE_LOADER_ID, recipeBundle, this);
