@@ -31,6 +31,8 @@ public class MediaFragment extends Fragment {
     SimpleExoPlayerView viewMediaPlayer;
 
     private SimpleExoPlayer simpleExoPlayer;
+    private long playerPos = 0;
+    private boolean playWhenReady = false;
 
     public MediaFragment() {
     }
@@ -54,6 +56,11 @@ public class MediaFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_media, container, false);
         ButterKnife.bind(this, view);
+
+        if (savedInstanceState != null) {
+            playerPos = savedInstanceState.getLong("PlayerPos");
+            playWhenReady = savedInstanceState.getBoolean("PlayWhenReady");
+        }
 
         setupExoPlayer();
 
@@ -98,6 +105,12 @@ public class MediaFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("PlayerPos", simpleExoPlayer.getCurrentPosition());
+        outState.putBoolean("PlayWhenReady", simpleExoPlayer.getPlayWhenReady());
+    }
 
     private void setupExoPlayer() {
 
@@ -112,15 +125,18 @@ public class MediaFragment extends Fragment {
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
             simpleExoPlayer.prepare(mediaSource);
-            simpleExoPlayer.setPlayWhenReady(true);
+            simpleExoPlayer.setPlayWhenReady(playWhenReady);
+            simpleExoPlayer.seekTo(playerPos);
         }
     }
 
     private void releasePlayer() {
         if (!mediaURL.equals("")) {
-            simpleExoPlayer.stop();
-            simpleExoPlayer.release();
-            simpleExoPlayer = null;
+            if (simpleExoPlayer != null) {
+                simpleExoPlayer.stop();
+                simpleExoPlayer.release();
+                simpleExoPlayer = null;
+            }
         }
     }
 }
