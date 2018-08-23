@@ -65,11 +65,16 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return steps.size();
+        if (steps != null) {
+            return steps.size();
+        }
+        return 0;
     }
 
     public void setSteps(List<Step> steps) {
-        this.steps = steps;
-        notifyDataSetChanged();
+        if (steps != null) {
+            this.steps = steps;
+            notifyDataSetChanged();
+        }
     }
 }
