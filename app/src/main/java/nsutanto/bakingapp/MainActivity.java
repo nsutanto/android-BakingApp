@@ -1,9 +1,12 @@
 package nsutanto.bakingapp;
 
 import android.app.FragmentManager;
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.RemoteViews;
@@ -15,6 +18,7 @@ import nsutanto.bakingapp.model.Recipe;
 
 public class MainActivity extends AppCompatActivity implements IRecipeFragmentListener {
 
+    private RecipeFragment recipeFragment = new RecipeFragment();
     private int widgetID;
     boolean isWidget = false;
     @Override
@@ -28,8 +32,6 @@ public class MainActivity extends AppCompatActivity implements IRecipeFragmentLi
 
     private void setupFragment() {
         FragmentManager fm = getFragmentManager();
-
-        RecipeFragment recipeFragment = new RecipeFragment();
 
         fm.beginTransaction()
                 .add(R.id.recipe_container, recipeFragment)
@@ -78,4 +80,11 @@ public class MainActivity extends AppCompatActivity implements IRecipeFragmentLi
         setResult(RESULT_OK, intent);
         finish();
     }
+
+    public IdlingResource getIdlingResource() {
+        return recipeFragment.getIdlingResource();
+    }
+
+
+
 }
